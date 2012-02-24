@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface GiaEval {
 
-	String function() default "return null;";
+	String function() default "return false;";
 	
 }

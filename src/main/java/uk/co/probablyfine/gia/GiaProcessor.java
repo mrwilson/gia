@@ -13,14 +13,28 @@ public class GiaProcessor implements MethodInterceptor  {
 		String function = arg0.getMethod().getAnnotation(GiaEval.class).function();
 		
 		Binding binding = new Binding();
-		binding.setVariable("foo", new Integer(2));
+		
+		for ( int i = 0 ; i < arg0.getMethod().getParameterTypes().length ; i++ ) {
+			String varname = "a".concat(Integer.toString(i+1));
+			System.out.println(varname);
+			binding.setVariable(varname, arg0.getArguments()[i]);
+			
+		}
+		
 		GroovyShell shell = new GroovyShell(binding);
 
-		Object value = shell.evaluate("println 'Hello World!'; x = 123; return foo * 10");
-
+		boolean value = (Boolean) shell.evaluate(function);
 		
+		System.out.println(value);
 		
-		return null;
+		if (value) {
+			System.out.println("Value was true, returning original argument");
+			return arg0.proceed();
+		} else {
+			System.out.println("Value was false, returning false");
+			return null;
+		}
+		
 	
 	}
 
