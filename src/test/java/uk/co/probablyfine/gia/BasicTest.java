@@ -20,7 +20,7 @@ public class BasicTest {
 		bt.function(2);
 	}
 	
-	@GiaEval("return a_1 == 1;")
+	@GiaEval("a_1 == 1;")
 	public int function(int foo) {
 		return foo;
 	}
