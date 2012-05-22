@@ -8,35 +8,26 @@ import org.aopalliance.intercept.MethodInvocation;
 
 public class GiaProcessor implements MethodInterceptor  {
 
-	public Object invoke(MethodInvocation arg0) throws Throwable {
+	public Object invoke(final MethodInvocation method) throws Throwable {
 		
-		String function = arg0.getMethod().getAnnotation(GiaEval.class).function();
+		final String function = method.getMethod().getAnnotation(GiaEval.class).value();
 		
-		Binding binding = new Binding();
+		final Binding binding = new Binding();
 		
-		for ( int i = 0 ; i < arg0.getMethod().getParameterTypes().length ; i++ ) {
-			String varname = "a".concat(Integer.toString(i+1));
-			System.out.println(varname);
-			binding.setVariable(varname, arg0.getArguments()[i]);
-			
+		for ( int i = 0 ; i < method.getMethod().getParameterTypes().length ; i++ ) {
+			String varname = "a_".concat(Integer.toString(i+1));
+			binding.setVariable(varname, method.getArguments()[i]);
 		}
 		
-		GroovyShell shell = new GroovyShell(binding);
+		final GroovyShell shell = new GroovyShell(binding);
 
-		boolean value = (Boolean) shell.evaluate(function);
+		final boolean value = (Boolean) shell.evaluate(function);
 		
-		System.out.println(value);
+		if (value) 
+			return method.proceed();
 		
-		if (value) {
-			System.out.println("Value was true, returning original argument");
-			return arg0.proceed();
-		} else {
-			System.out.println("Value was false, returning false");
-			return null;
-		}
+		throw new GiaException(String.format("Gia eval returned false: %s", method.getMethod().getName()));
 		
-	
 	}
-
 	
 }
